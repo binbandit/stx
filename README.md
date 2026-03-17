@@ -1,22 +1,22 @@
-# xx
+# stx
 
 Fast TypeScript runner for Node.js. Like [tsx](https://github.com/privatenumber/tsx) but uses [Rolldown/Oxc](https://rolldown.rs) (Rust) instead of esbuild (Go) for transforms.
 
 ## Install
 
 ```bash
-pnpm add xx
+pnpm add stx
 ```
 
 ## Usage
 
 ```bash
-xx file.ts                       # run a ts file
-xx watch server.ts               # watch mode
-xx -e "const x: number = 1"      # eval
-xx -p "1 + 2"                    # eval + print
-xx --test                        # node test runner w/ ts
-xx                               # repl
+stx file.ts                       # run a ts file
+stx watch server.ts               # watch mode
+stx -e "const x: number = 1"      # eval
+stx -p "1 + 2"                    # eval + print
+stx --test                        # node test runner w/ ts
+stx                               # repl
 ```
 
 All node flags pass through (`--env-file`, `--inspect`, etc).
@@ -26,24 +26,24 @@ All node flags pass through (`--env-file`, `--inspect`, etc).
 Skip the CLI overhead entirely:
 
 ```bash
-node --import xx/loader file.ts
+node --import stx/loader file.ts
 ```
 
 ## Benchmarks
 
 Measured with [hyperfine](https://github.com/sharkdp/hyperfine) on Node v25.6.1, macOS arm64. 30 runs, 3 warmup.
 
-**Hooks-only** (no CLI process, just the loader — apples-to-apples transform comparison):
+**Hooks-only** (no CLI process, just the loader -- apples-to-apples transform comparison):
 
-| | tsx | xx | |
+| | tsx | stx | |
 |---|--:|--:|---|
 | 1 file | 177ms | 126ms | 1.4x |
 | 5 modules | 193ms | 120ms | 1.6x |
 | 100 modules | 303ms | 148ms | **2.1x** |
 
-**E2E** (full `xx file.ts` vs `tsx file.ts`):
+**E2E** (full `stx file.ts` vs `tsx file.ts`):
 
-| | tsx | xx | |
+| | tsx | stx | |
 |---|--:|--:|---|
 | 1 file | 190ms | 153ms | 1.2x |
 | types-heavy | 208ms | 151ms | 1.4x |
@@ -57,11 +57,11 @@ Run `bash bench/run.sh` to reproduce (needs hyperfine + tsx).
 
 ## How it works
 
-Same architecture as tsx — CLI spawns `node --no-strip-types --import <loader> file.ts`, loader registers ESM hooks via `module.register()`, hooks intercept `.ts`/`.tsx`/`.mts`/`.cts` imports and run them through Oxc's `transformSync`. CJS support via `Module._extensions` patching.
+Same architecture as tsx -- CLI spawns `node --no-strip-types --import <loader> file.ts`, loader registers ESM hooks via `module.register()`, hooks intercept `.ts`/`.tsx`/`.mts`/`.cts` imports and run them through Oxc's `transformSync`. CJS support via `Module._extensions` patching.
 
 We import from `rolldown/utils` instead of `rolldown/experimental` which avoids loading the full bundler engine (~9ms vs ~44ms import time).
 
-Also handles `.js` → `.ts` remapping, extensionless resolution, directory/index resolution, and tsconfig paths (lazy-loaded so there's zero cost if you don't use them).
+Also handles `.js` -> `.ts` remapping, extensionless resolution, directory/index resolution, and tsconfig paths (lazy-loaded so there's zero cost if you don't use them).
 
 ## Requirements
 

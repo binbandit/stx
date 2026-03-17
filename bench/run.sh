@@ -2,13 +2,13 @@
 set -euo pipefail
 
 # ─────────────────────────────────────────────────────────────────
-# xx benchmark suite
+# stx benchmark suite
 #
 # Two sections:
 #
-#   1. END-TO-END (CLI → script exit)
-#      Measures what the user actually experiences: `xx file.ts`
-#      Both tsx and xx spawn a child process, so this includes CLI
+#   1. END-TO-END (CLI -> script exit)
+#      Measures what the user actually experiences: `stx file.ts`
+#      Both tsx and stx spawn a child process, so this includes CLI
 #      startup + child spawn + loader init + transform + execution.
 #
 #   2. HOOKS-ONLY (loader overhead, no CLI)
@@ -21,9 +21,9 @@ set -euo pipefail
 # Three runners:
 #   node --strip-types  (Node.js built-in baseline, zero overhead)
 #   tsx                 (incumbent, esbuild-powered)
-#   xx                  (challenger, Rolldown/Oxc-powered)
+#   stx                 (challenger, Rolldown/Oxc-powered)
 #
-# Requirements: hyperfine, tsx, xx (built)
+# Requirements: hyperfine, tsx, stx (built)
 # ─────────────────────────────────────────────────────────────────
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -31,8 +31,8 @@ ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 FIXTURES="$SCRIPT_DIR/fixtures"
 RESULTS_DIR="$SCRIPT_DIR/results"
 
-XX_CLI="$ROOT/dist/cli.mjs"
-XX_LOADER="$ROOT/dist/loader.mjs"
+STX_CLI="$ROOT/dist/cli.mjs"
+STX_LOADER="$ROOT/dist/loader.mjs"
 TSX_CLI="$ROOT/node_modules/.bin/tsx"
 TSX_LOADER="$ROOT/node_modules/tsx/dist/loader.mjs"
 
@@ -46,11 +46,11 @@ TSX_V=$(pnpm tsx --version 2>/dev/null | head -1)
 
 echo ""
 echo "================================================================"
-echo "  xx benchmark suite"
+echo "  stx benchmark suite"
 echo "================================================================"
 echo "  node     $NODE_V"
 echo "  tsx      $TSX_V"
-echo "  xx       v0.1.0  (rolldown/oxc)"
+echo "  stx      v0.1.0  (rolldown/oxc)"
 echo "  hyperfine $(hyperfine --version)"
 echo "  warmup   $WARMUP    runs   $RUNS"
 echo "  date     $(date -u '+%Y-%m-%d %H:%M UTC')"
@@ -62,7 +62,7 @@ echo ""
 
 echo ""
 echo "╔══════════════════════════════════════════════════════════╗"
-echo "║  SECTION 1: END-TO-END  (full CLI → exit)              ║"
+echo "║  SECTION 1: END-TO-END  (full CLI -> exit)              ║"
 echo "╚══════════════════════════════════════════════════════════╝"
 
 run_e2e() {
@@ -81,7 +81,7 @@ run_e2e() {
     --style full \
     -n "node (built-in)" "$node_cmd" \
     -n "tsx"             "$TSX_CLI $fixture" \
-    -n "xx"              "node $XX_CLI $fixture"
+    -n "stx"             "node $STX_CLI $fixture"
 }
 
 run_e2e "01-hello" \
@@ -130,7 +130,7 @@ run_hooks() {
     --style full \
     -n "node (built-in)" "$node_cmd" \
     -n "tsx hooks (esbuild)"  "node --no-strip-types --import $TSX_LOADER $fixture" \
-    -n "xx hooks (oxc)"       "node --no-strip-types --import $XX_LOADER $fixture"
+    -n "stx hooks (oxc)"      "node --no-strip-types --import $STX_LOADER $fixture"
 }
 
 run_hooks "01-hello" \

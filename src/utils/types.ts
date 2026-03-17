@@ -9,7 +9,7 @@ export interface TransformResult {
   };
 }
 
-export interface XxOptions {
+export interface StxOptions {
   noCache?: boolean;
   tsconfigPath?: string;
 }

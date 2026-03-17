@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-// xx — fast tsx alternative using rolldown/oxc
+// stx — fast tsx alternative using rolldown/oxc
 // spawns a child node process with our loader hooks registered via --import
 
 import { spawn, type ChildProcess } from 'node:child_process';
@@ -184,7 +184,7 @@ const args = parseArgs(process.argv.slice(2));
 
 switch (args.command) {
   case 'version':
-    process.stdout.write(`xx v${VERSION}\nnode ${process.version}\n`);
+    process.stdout.write(`stx v${VERSION}\nnode ${process.version}\n`);
     break;
   case 'help':
     printHelp();
@@ -203,8 +203,8 @@ switch (args.command) {
 
 function handleRun(args: ParsedArgs): void {
   const env: NodeJS.ProcessEnv = { ...process.env };
-  if (args.tsconfig) env.XX_TSCONFIG_PATH = args.tsconfig;
-  if (args.noCache) env.XX_DISABLE_CACHE = '1';
+  if (args.tsconfig) env.STX_TSCONFIG_PATH = args.tsconfig;
+  if (args.noCache) env.STX_DISABLE_CACHE = '1';
 
   const loaderURL = pathToFileURL(resolveLoaderPath()).href;
 
@@ -278,7 +278,7 @@ function handleWatch(args: ParsedArgs): void {
 
 function handleRepl(args: ParsedArgs): void {
   const env: NodeJS.ProcessEnv = { ...process.env };
-  if (args.tsconfig) env.XX_TSCONFIG_PATH = args.tsconfig;
+  if (args.tsconfig) env.STX_TSCONFIG_PATH = args.tsconfig;
 
   const loaderURL = pathToFileURL(resolveLoaderPath()).href;
 
@@ -327,11 +327,11 @@ function relaySignals(child: ChildProcess): void {
 
 function printHelp(): void {
   process.stdout.write(`
-xx v${VERSION} - fast typescript execution
+stx v${VERSION} - fast typescript execution
 
 Usage:
-  xx [flags] <script.ts> [script args...]
-  xx watch [flags] <script.ts> [script args...]
+  stx [flags] <script.ts> [script args...]
+  stx watch [flags] <script.ts> [script args...]
 
 Commands:
   watch             Watch mode - restart on file changes
@@ -351,12 +351,12 @@ Watch flags:
   --clear-screen=false  Disable screen clearing on restart
 
 Examples:
-  xx file.ts                   Run a TypeScript file
-  xx --env-file=.env file.ts   Run with environment file
-  xx watch server.ts           Watch mode
-  xx -e "console.log(42)"      Evaluate expression
-  xx --test                    Run tests
-  xx                           TypeScript REPL
+  stx file.ts                   Run a TypeScript file
+  stx --env-file=.env file.ts   Run with environment file
+  stx watch server.ts           Watch mode
+  stx -e "console.log(42)"      Evaluate expression
+  stx --test                    Run tests
+  stx                           TypeScript REPL
 
 All node flags are passed through.
 `);
